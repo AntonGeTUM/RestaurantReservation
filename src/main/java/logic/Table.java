@@ -9,13 +9,9 @@ public class Table {
 
     public Table() {}
 
-    /**
-     * A table object has an ID and a fixed number of people that can fit at that table.
-     * @param id the id of the table (int)
-     */
     public Table(int id) {
         Random random = new Random();
-        this.numberOfPeople = random.nextInt(2, 6);
+        this.numberOfPeople = random.nextInt(1, 4) * 2;
         this.id = id;
     }
 

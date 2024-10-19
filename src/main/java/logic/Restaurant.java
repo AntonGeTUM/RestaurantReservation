@@ -1,5 +1,7 @@
 package logic;
 
+import org.postgresql.shaded.com.ongres.stringprep.Tables;
+
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -10,50 +12,88 @@ public class Restaurant {
     private Pricing priceCategory;
     private String cuisine;
     private String city;
-    private List<Review> reviews;
-    private BigDecimal rating;
     private List<Table> tables;
-    private HashMap<String, Reservation> reservations;
     private int maxVisitors;
     private String fullAddress;
     private String link;
 
     public Restaurant() {}
 
-    public Restaurant(String name, String cuisine, String city, String link) {
+    //every fetched restaurant has to be instantiated once to create a random number of tables for 2 - 6 persons each
+    public Restaurant(String name, String cuisine, String city, String address, String link) {
         this.name = name;
         this.id = UUID.randomUUID();
         this.priceCategory = Pricing.random();
         this.cuisine = cuisine;
         this.city = city;
-        this.reviews = new ArrayList<>();
-        this.rating = BigDecimal.ZERO;
         this.tables = new ArrayList<>();
         Random random = new Random();
         int numOfTables = random.nextInt(5, 20);
         for (int i = 1; i <= numOfTables; i++) {
             tables.add(new Table(i));
         }
-        this.reservations = new HashMap<String, Reservation>();
-        this.fullAddress = "";
+        this.fullAddress = address;
         this.link = link;
     }
 
-    //TODO:
+    public String getName() {
+        return name;
+    }
 
-    //create schedule, i.e. available reservation slots
+    public UUID getId() {
+        return id;
+    }
 
-    //get maximum number of visitors
+    public Pricing getPriceCategory() {
+        return priceCategory;
+    }
 
-    //add review (recalculate rating)
+    public String getCuisine() {
+        return cuisine;
+    }
 
-    //calculate average rating
+    public String getCity() {
+        return city;
+    }
 
-    //check for reservation slot for a given date
+    public List<Table> getTables() {
+        return tables;
+    }
 
-    //return available tables
+    public int getMaxVisitors() {
+        return maxVisitors;
+    }
 
-    //reserve table: remove from available slots, add to table
+    public String getFullAddress() {
+        return fullAddress;
+    }
 
-    //remove reservation, add back to available
+    public String getLink() {
+        return link;
+    }
+
+    public int[] getAllTables() {
+        int two = 0, four = 0, six = 0;
+        for (Table t : tables) {
+            switch(t.getNumberOfPeople()) {
+                case 2 -> two++;
+                case 4 -> four++;
+                case 6 -> six++;
+            }
+        }
+        return new int[] {two, four, six};
+    }
+
+    /*TODO:
+    *  - remove DAY and TimeSlot, no need to model -> limit options directly in the frontend
+    *    e.g. disable minutes or set to 30-min steps
+    *  - reserve table: add to database (done)
+    *                   disable selection in DateTimePicker
+    *                   sent out confirmation for reservation
+    *  - cancel reservation: remove from database (done)
+    *                        allow selection in DateTimePicker
+    *                        sent out confirmation for cancellation
+    *  -> all dates and times, that can be selected, are assumed to be available
+    * */
+
 }
