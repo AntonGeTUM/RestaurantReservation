@@ -11,12 +11,6 @@ public class Review {
 
     public Review() {}
 
-    /**
-     * A review object consists of the name of the review, a rating and a text.
-     * @param name the name of the reviewer
-     * @param rating the rating as String (see Enum Rating)
-     * @param review the content of the review
-     */
     public Review(String name, Rating rating, String review) {
         this.name = name;
         this.rating = rating;

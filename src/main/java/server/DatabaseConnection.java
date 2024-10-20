@@ -147,11 +147,6 @@ public class DatabaseConnection {
         }
     }
 
-    /*
-    * TODO:
-    *   -
-    * */
-
     private static String[] readUserAndPW() {
         try {
             BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/postgres.txt"));
@@ -167,21 +162,4 @@ public class DatabaseConnection {
         }
         return null;
     }
-
-    public static void main(String[] args) {
-        Restaurant test = new Restaurant("Tio", List.of("italienisch"), "Erlangen",
-                "Südliche Stadtmauerstraße 1A, 91054 Erlangen", "https://tio-erlangen.de/tio/", "09131/1234567");
-        int[] tables = test.getAllTables();
-        DatabaseConnection connection = getInstance();
-        //connection.insertRestaurant(test.getId().toString(), test.getName(), test.getCuisine(), test.getCity(),test.getPriceCategory().name(), test.getFullAddress(), tables[0], tables[1], tables[2], Optional.of(test.getLink()));
-        Review review = new Review("George", Rating.ONESTAR, "I was ignored");
-        //connection.insertRating("6289daf4-e12c-4e2e-8737-1cd5f587323e" + "2", review.getRating(),review.getName(), "6289daf4-e12c-4e2e-8737-1cd5f587323e", review.getReview());
-        Reservation res = new Reservation("6289daf4-e12c-4e2e-8737-1cd5f587323e", LocalDateTime.now(), 2);
-        //connection.insertReservation(res.getUuid() + res.encodeReservation(), "6289daf4-e12c-4e2e-8737-1cd5f587323e", res.getDate().toString(), String.valueOf(res.getDate().getHour()), res.getNumberPeople());
-        //System.out.println(connection.hasQuery("review", "6289daf4-e12c-4e2e-8737-1cd5f587323e"));
-        //System.out.println(connection.getAvgRating("6289daf4-e12c-4e2e-8737-1cd5f587323e"));
-        //System.out.println(connection.hasQuery("reservation", "6289daf4-e12c-4e2e-8737-1cd5f587323eMjAyNC0xMC0xOVQyMTo1ODoxMi4wNDkzOTQ="));
-        //connection.removeReservation("6289daf4-e12c-4e2e-8737-1cd5f587323eMjAyNC0xMC0xOVQyMjoxNTowMC44Mzg5MjU=");
-    }
 }
-//restaurant uuid: 6289daf4-e12c-4e2e-8737-1cd5f587323e

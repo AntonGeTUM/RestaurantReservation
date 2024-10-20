@@ -101,10 +101,4 @@ public class Restaurant {
     *                        sent out confirmation for cancellation
     *  -> all dates and times, that can be selected, are assumed to be available
     * */
-    public static void main(String[] args) {
-        Restaurant test = new Restaurant("Tio", List.of("italienisch, mediterran"), "Erlangen",
-                "Südliche Stadtmauerstraße 1A, 91054 Erlangen", "https://tio-erlangen.de/tio/", "09131/1234567");
-        System.out.println(test.getCuisine());
-    }
-
 }
