@@ -24,7 +24,7 @@ public class Restaurant {
     public Restaurant(String name, List<String> cuisine, String city, String address, String link, String phone) {
         this.name = name;
         this.id = UUID.randomUUID();
-        this.priceCategory = Pricing.random();
+        this.priceCategory = Pricing.random(cuisine.contains("Gourmet"));
         this.cuisine = cuisine;
         this.city = city;
         this.tables = new ArrayList<>();
@@ -51,7 +51,7 @@ public class Restaurant {
     }
 
     public String getCuisine() {
-        return cuisine.toString();
+        return String.join(", ", cuisine);
     }
 
     public String getCity() {
