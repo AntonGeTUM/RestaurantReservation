@@ -13,6 +13,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,9 +44,9 @@ public class DatabaseConnection {
     }
 
     public void insertRestaurant(String id, String name, String cuisine, String city, String priceCat
-    , String address, int table2, int table4, int table6, Optional<String> link) {
-        final String query = "insert into restaurant(id, name, cuisine, city, price_cat, address, table_2, table_4, table_6, link)" +
-                " values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    , String address, int table2, int table4, int table6, String link, String phone) {
+        final String query = "insert into restaurant(id, name, cuisine, city, price_cat, address, table_2, table_4, table_6, link, phone_number)" +
+                " values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, id);
@@ -57,11 +58,8 @@ public class DatabaseConnection {
             statement.setInt(7, table2);
             statement.setInt(8, table4);
             statement.setInt(9, table6);
-            if (link.isPresent()) {
-                statement.setString(10, link.get());
-            } else {
-                statement.setString(10, "");
-            }
+            statement.setString(10, link);
+            statement.setString(11, phone);
             statement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -132,6 +130,7 @@ public class DatabaseConnection {
         return switch (type) {
             case "reservation" -> "select exists(select 1 from reservation where id = ?)";
             case "review" -> "select exists(select 1 from review where restau_id = ?)";
+            case "city" -> "select exists(select 1 from restaurant where city = ?)";
             default -> "";
         };
     }
@@ -170,8 +169,8 @@ public class DatabaseConnection {
     }
 
     public static void main(String[] args) {
-        Restaurant test = new Restaurant("Tio", "italienisch", "Erlangen",
-                "Südliche Stadtmauerstraße 1A, 91054 Erlangen", "https://tio-erlangen.de/tio/");
+        Restaurant test = new Restaurant("Tio", List.of("italienisch"), "Erlangen",
+                "Südliche Stadtmauerstraße 1A, 91054 Erlangen", "https://tio-erlangen.de/tio/", "09131/1234567");
         int[] tables = test.getAllTables();
         DatabaseConnection connection = getInstance();
         //connection.insertRestaurant(test.getId().toString(), test.getName(), test.getCuisine(), test.getCity(),test.getPriceCategory().name(), test.getFullAddress(), tables[0], tables[1], tables[2], Optional.of(test.getLink()));

@@ -10,17 +10,18 @@ public class Restaurant {
     private String name;
     private UUID id;
     private Pricing priceCategory;
-    private String cuisine;
+    private List<String> cuisine;
     private String city;
     private List<Table> tables;
     private int maxVisitors;
     private String fullAddress;
     private String link;
+    private String phone;
 
     public Restaurant() {}
 
     //every fetched restaurant has to be instantiated once to create a random number of tables for 2 - 6 persons each
-    public Restaurant(String name, String cuisine, String city, String address, String link) {
+    public Restaurant(String name, List<String> cuisine, String city, String address, String link, String phone) {
         this.name = name;
         this.id = UUID.randomUUID();
         this.priceCategory = Pricing.random();
@@ -34,6 +35,7 @@ public class Restaurant {
         }
         this.fullAddress = address;
         this.link = link;
+        this.phone = phone;
     }
 
     public String getName() {
@@ -49,7 +51,7 @@ public class Restaurant {
     }
 
     public String getCuisine() {
-        return cuisine;
+        return cuisine.toString();
     }
 
     public String getCity() {
@@ -70,6 +72,10 @@ public class Restaurant {
 
     public String getLink() {
         return link;
+    }
+
+    public String getPhone() {
+        return phone;
     }
 
     public int[] getAllTables() {
@@ -95,5 +101,10 @@ public class Restaurant {
     *                        sent out confirmation for cancellation
     *  -> all dates and times, that can be selected, are assumed to be available
     * */
+    public static void main(String[] args) {
+        Restaurant test = new Restaurant("Tio", List.of("italienisch, mediterran"), "Erlangen",
+                "Südliche Stadtmauerstraße 1A, 91054 Erlangen", "https://tio-erlangen.de/tio/", "09131/1234567");
+        System.out.println(test.getCuisine());
+    }
 
 }

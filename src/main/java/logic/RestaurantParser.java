@@ -3,23 +3,65 @@ package logic;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import server.DatabaseConnection;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class RestaurantParser {
 
-    private final String url = "https://www.speisekarte.de/%s/restaurants";
+    private final String url = "https://www.speisekarte.de/%s/restaurants%s";
+    private final String[] pages = {"", "?page=2", "?page=3"};
+    private final DatabaseConnection connection = DatabaseConnection.getInstance();
 
     public RestaurantParser() {
     }
 
-    public void fetchRestaurants(String city) {
+    public void fetchRestaurantsByCity(String city) {
+        if (connection.hasQuery("city", city)) return;
         try {
-            String tmp = String.format(url, city);
-            Document doc = Jsoup.connect(tmp).get();
-            Element elem = doc.getElementById("searchFilterResult");
-            String data = elem.html();
-            System.out.println(data);
+            List<String> names = new ArrayList<>();
+            List<String> links = new ArrayList<>();
+            for (int i = 0; i < pages.length; i++) {
+                String tmp = String.format(url, city, pages[i]);
+                Document doc = Jsoup.connect(tmp).get();
+                var res = doc.body().getElementsByAttributeValueContaining("id", "restaurant-result-title");
+                res.stream().map(e -> e.select("a"))
+                        .forEach(e -> {
+                            links.add(e.attr("href"));
+                            names.add(e.text());
+                        });
+            }
+            List<String> addresses = new ArrayList<>();
+            List<List<String>> cuisines = new ArrayList<>();
+            List<String> phoneNumbers = new ArrayList<>();
+            List<String> websites = new ArrayList<>();
+            for (String link : links) {
+                Document curRes = Jsoup.connect(link).get();
+
+                addresses.add(curRes.getElementById("detail-map").select("p").text());
+
+                List<String> cuisineTypes = new ArrayList<>();
+                var elems = curRes.getElementById("detail-kitchen-types").select("a");
+                for (Element e : elems) cuisineTypes.add(e.text());
+                cuisines.add(cuisineTypes);
+
+                phoneNumbers.add(curRes.getElementById("detail-phone").attr("href"));
+
+                if (curRes.getElementById("detail-website") != null) {
+                    websites.add(curRes.getElementById("detail-website").attr("href"));
+                } else {
+                    websites.add("no website available");
+                }
+            }
+            for (int i = 0; i < websites.size(); i++) {
+                Restaurant res = new Restaurant(names.get(i), cuisines.get(i), city, addresses.get(i), links.get(i), phoneNumbers.get(i));
+                int[] tables = res.getAllTables();
+                connection.insertRestaurant(res.getId().toString(), res.getName(), res.getCuisine(), res.getCity(),
+                        res.getPriceCategory().name(), res.getFullAddress(), tables[0], tables[1], tables[2], res.getLink(), res.getPhone());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -27,6 +69,6 @@ public class RestaurantParser {
 
     public static void main(String[] args) {
         RestaurantParser parser = new RestaurantParser();
-        parser.fetchRestaurants("München");
+        parser.fetchRestaurantsByCity("München");
     }
 }
