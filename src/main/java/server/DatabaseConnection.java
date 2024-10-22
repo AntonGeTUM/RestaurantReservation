@@ -1,9 +1,12 @@
 package server;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import logic.Pricing;
 import logic.Rating;
-import logic.Reservation;
 import logic.Restaurant;
-import logic.Review;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -12,10 +15,10 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class DatabaseConnection {
 
@@ -44,9 +47,9 @@ public class DatabaseConnection {
     }
 
     public void insertRestaurant(String id, String name, String cuisine, String city, String priceCat
-    , String address, int table2, int table4, int table6, String link, String phone) {
-        final String query = "insert into restaurant(id, name, cuisine, city, price_cat, address, table_2, table_4, table_6, link, phone_number)" +
-                " values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            , String address, String link, String phone) {
+        final String query = "insert into restaurant(id, name, cuisine, city, price_cat, address, link, phone_number)" +
+                " values(?, ?, ?, ?, ?, ?, ?, ?)";
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, id);
@@ -55,15 +58,50 @@ public class DatabaseConnection {
             statement.setString(4, city);
             statement.setString(5, priceCat);
             statement.setString(6, address);
-            statement.setInt(7, table2);
-            statement.setInt(8, table4);
-            statement.setInt(9, table6);
-            statement.setString(10, link);
-            statement.setString(11, phone);
+            statement.setString(7, link);
+            statement.setString(8, phone);
             statement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public List<Restaurant> getRestaurantByCity(String city) {
+        final String query = "select * from restaurant where city = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, city);
+            ResultSet set = statement.executeQuery();
+            List<Restaurant> res = new ArrayList<>();
+            while(set.next()) {
+                List<String> cuisine = Arrays.asList(set.getString(3).split(", "));
+                Restaurant r = new Restaurant(set.getString(1), set.getString(2), cuisine,
+                        set.getString(4), set.getString(5),
+                        set.getString(6), set.getString(7), set.getString(8));
+                res.add(r);
+            }
+            return res;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Restaurant getSingleRestaurant(String id) {
+        final String query = "select * from restaurant where id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, id);
+            ResultSet set = statement.executeQuery();
+            set.next();
+            List<String> cuisine = Arrays.asList(set.getString(3).split(", "));
+            return new Restaurant(set.getString(1), set.getString(2), cuisine,
+                    set.getString(4), set.getString(5),
+                    set.getString(6), set.getString(7), set.getString(8));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void insertRating(String id, Rating rating, String name, String restaurantID, String review) {
@@ -145,6 +183,30 @@ public class DatabaseConnection {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public int[] getReservationsGivenDateTime(String restaurantID, String date, String begin) {
+        final String query = "select num_people from reservation where restau_id = ? AND date = ? AND begin = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
+            statement.setString(1, restaurantID);
+            statement.setString(2, date);
+            statement.setString(3, begin);
+            ResultSet set = statement.executeQuery();
+            int rows = set.last() ? set.getRow() : 0;
+            if (rows == 0) return new int[]{};
+            set.first();
+            int[] res = new int[rows];
+            for (int i = 0; i < rows; i++) {
+                res[i] = set.getInt(1);
+                set.next();
+            }
+            return res;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private static String[] readUserAndPW() {

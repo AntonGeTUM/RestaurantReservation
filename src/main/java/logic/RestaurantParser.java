@@ -58,9 +58,8 @@ public class RestaurantParser {
             }
             for (int i = 0; i < websites.size(); i++) {
                 Restaurant res = new Restaurant(names.get(i), cuisines.get(i), city, addresses.get(i), websites.get(i), phoneNumbers.get(i));
-                int[] tables = res.getAllTables();
                 connection.insertRestaurant(res.getId().toString(), res.getName(), res.getCuisine(), res.getCity(),
-                        res.getPriceCategory().name(), res.getFullAddress(), tables[0], tables[1], tables[2], res.getLink(), res.getPhone());
+                        res.getPriceCategory().name(), res.getFullAddress(), res.getLink(), res.getPhone());
             }
         } catch (IOException e) {
             e.printStackTrace();

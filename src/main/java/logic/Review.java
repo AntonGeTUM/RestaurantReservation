@@ -1,10 +1,13 @@
 package logic;
 
+import java.util.UUID;
+
 /**
  *
  */
 public class Review {
 
+    private UUID uuid;
     private String name;
     private Rating rating;
     private String review;
@@ -12,6 +15,7 @@ public class Review {
     public Review() {}
 
     public Review(String name, Rating rating, String review) {
+        this.uuid = UUID.randomUUID();
         this.name = name;
         this.rating = rating;
         this.review = review;
@@ -21,8 +25,8 @@ public class Review {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public UUID getUuid() {
+        return uuid;
     }
 
     public String toString() {

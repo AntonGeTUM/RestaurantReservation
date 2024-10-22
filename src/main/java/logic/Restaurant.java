@@ -12,8 +12,6 @@ public class Restaurant {
     private Pricing priceCategory;
     private List<String> cuisine;
     private String city;
-    private List<Table> tables;
-    private int maxVisitors;
     private String fullAddress;
     private String link;
     private String phone;
@@ -27,12 +25,18 @@ public class Restaurant {
         this.priceCategory = Pricing.random(cuisine.contains("Gourmet"));
         this.cuisine = cuisine;
         this.city = city;
-        this.tables = new ArrayList<>();
-        Random random = new Random();
-        int numOfTables = random.nextInt(5, 20);
-        for (int i = 1; i <= numOfTables; i++) {
-            tables.add(new Table(i));
-        }
+        this.fullAddress = address;
+        this.link = link;
+        this.phone = phone;
+    }
+
+    public Restaurant(String uuid, String name, List<String> cuisine, String city, String priceCat, String address,
+                      String link, String phone) {
+        this.id = UUID.fromString(uuid);
+        this.name = name;
+        this.cuisine = cuisine;
+        this.city = city;
+        this.priceCategory = Pricing.fromString(priceCat);
         this.fullAddress = address;
         this.link = link;
         this.phone = phone;
@@ -58,14 +62,6 @@ public class Restaurant {
         return city;
     }
 
-    public List<Table> getTables() {
-        return tables;
-    }
-
-    public int getMaxVisitors() {
-        return maxVisitors;
-    }
-
     public String getFullAddress() {
         return fullAddress;
     }
@@ -78,26 +74,12 @@ public class Restaurant {
         return phone;
     }
 
-    public int[] getAllTables() {
-        int two = 0, four = 0, six = 0;
-        for (Table t : tables) {
-            switch(t.getNumberOfPeople()) {
-                case 2 -> two++;
-                case 4 -> four++;
-                case 6 -> six++;
-            }
-        }
-        return new int[] {two, four, six};
-    }
-
     /*TODO:
     *  - remove DAY and TimeSlot, no need to model -> limit options directly in the frontend
     *    e.g. disable minutes or set to 30-min steps
     *  - reserve table: add to database (done)
-    *                   disable selection in DateTimePicker
     *                   sent out confirmation for reservation
     *  - cancel reservation: remove from database (done)
-    *                        allow selection in DateTimePicker
     *                        sent out confirmation for cancellation
     *  -> all dates and times, that can be selected, are assumed to be available
     * */
